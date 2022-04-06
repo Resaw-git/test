@@ -1,46 +1,42 @@
 const chart = document.getElementById('chart')
-const newArr = []
 
 function setPlan(value) {
     trace4.y = [value, value]
     Plotly.newPlot(chart, data, layout, config)
 }
 
-let newValue = []
-let newTime = []
-
 function setValue(value, date) {
-    time.push([value, date])
-    initData()
-    trace1.x = newTime
-    trace1.y = newValue
+    points.push([value, date])
+    initPoints()
     Plotly.newPlot(chart, data, layout, config)
 }
 
-const time = [
+function initPoints() {
+    points.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
+    trace1.x = points.map(e => e[1])
+    trace1.y = points.map(e => e[0])
+    trace2.x = trace1.x
+    trace2.y = []
+    trace1.y.reduce((sum, current) => {
+        trace2.y.push(current  - sum)
+        return current
+    }, 0)
+}
+
+const points = [
     [10, '2022-06-15 5:00'],
     [12, '2022-06-15 6:00'],
     [20, '2022-06-15 8:00'],
-    [15, '2022-06-15 7:00'],     
-    [25, '2022-06-15 9:00'], 
-    [35, '2022-06-15 10:00'], 
+    [15, '2022-06-15 7:00'],
+    [25, '2022-06-15 9:00'],
+    [35, '2022-06-15 10:00'],
+    [40, '2022-06-15 10:30'],
 ]
-
-function initData() {
-    time.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
-    newValue = time.map(e => e[0])
-    newTime = time.map(e => e[1])
-}
-
-initData()
-
-console.log(new Date(1529038860000).toISOString().replace(/^([^T]+)T(.+)$/,'$1'))
-
 
 const trace1 = {
     name: 'Добыто (сутки)',
-    x: newTime,
-    y: newValue,
+    x: 0,
+    y: 0,
     mode: 'lines',
     type: 'scatter',
     marker: {
@@ -56,23 +52,18 @@ const trace1 = {
         font: {
             color: '#000'
         }
-
-    }, 
+    },
     hovertemplate: '%{x}<br>Добыто (сутки): %{y}',
 }
 
-trace1.y.reduce((sum , current) => {
-    newArr.push(current  - sum)
-    return current }, 0)
-
 const trace2 = {
     name: 'Добыто (час)',
-    x: time,
-    y: newArr,
+    x: 0,
+    y: 0,
     mode: 'lines',
     type: 'bar',
     marker: {
-        color: '#90ee90',
+        color: 'green',
         line: {
             width: 2.5,
             color: '#fff',
@@ -85,8 +76,7 @@ const trace2 = {
         font: {
             color: '#000'
         }
-
-    }, 
+    },
     hovertemplate: '%{x}<br>Добыто (час): %{y}',
 }
 
@@ -115,7 +105,7 @@ const trace3 = {
             color: '#000'
         }
 
-    }, 
+    },
     hovertemplate: '%{x}<br>Прогноз добычи: %{y}',
 }
 
@@ -138,7 +128,7 @@ const trace4 = {
             color: '#000'
         }
 
-    }, 
+    },
     hovertemplate: '%{x}<br>План добычи: %{y}',
 }
 
@@ -174,7 +164,10 @@ const config = {
 
 
 
-
+initPoints()
+console.log(trace2)
 Plotly.newPlot(chart, data, layout, config)
 
-
+console.log(new Date(1529038860000).toISOString())
+console.log(new Date('2022-06-15 10:00').getTime())
+console.log(Date.parse('2022-06-15 10:00'))
