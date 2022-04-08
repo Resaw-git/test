@@ -13,31 +13,59 @@ function setValue(value, date) {
 
 function initPoints() {
     points.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
-    trace1.x = points.map(e => e[1])
-    trace1.y = points.map(e => e[0])
-    trace2.x = trace1.x
-    trace2.y = []
-    trace1.y.reduce((sum, current) => {
-        trace2.y.push(current  - sum)
+    arr1.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
+    trace1.x = trace2.x = arr1.map(e => e[1])
+    trace1.y = arr1.map(e => e[0])
+    trace2.y = arr1.map(e => e[0])
+    trace2.y.reduce((sum, current, index) => {
+        trace2.y[index] = (current  - sum)
         return current
     }, 0)
 }
 
 const points = [
-    [10, '2022-06-15 5:00'],
-    [12, '2022-06-15 6:00'],
-    [20, '2022-06-15 8:00'],
-    [15, '2022-06-15 7:00'],
-    [25, '2022-06-15 9:00'],
-    [35, '2022-06-15 10:00'],
-    [40, '2022-06-15 10:30'],
+    [10, '2022-06-15 5:01'],
+    [10, '2022-06-15 5:30'],
+    [10, '2022-06-15 5:50'],
+    [12, '2022-06-15 6:34'],
+    [20, '2022-06-15 8:11'],
+    [15, '2022-06-15 7:32'],
+    [25, '2022-06-15 9:01'],
+    [40, '2022-06-15 10:55'],
+    [35, '2022-06-15 10:44'],
+    [55, '2022-06-15 10:59'],
+    [35, '2022-06-15 10:24'],
 ]
+
+const newArr = points.map(e => {
+    return [e[0], new Date(e[1]).getHours()]
+})
+
+const arr1 = []
+newArr.reduce((previousValue, currentValue) => {
+    if (previousValue[1] == currentValue[1]) {
+        arr1.push([previousValue[0], '2022-06-15 ' + previousValue[1] + ':00'])
+        arr1.reduce((previous, current, index) => {
+            if (previous[1] == current[1]) {
+                arr1.splice(index-1, 1)
+            }
+            return current
+        })
+    } else {
+        previousValue = [previousValue[0], '2022-06-15 ' + previousValue[1] + ':00']
+        arr1.push(previousValue)
+    }
+    return currentValue
+})
+
+console.log(arr1)
+
 
 const trace1 = {
     name: 'Добыто (сутки)',
     x: 0,
     y: 0,
-    mode: 'lines',
+    mode: 'lines+markers',
     type: 'scatter',
     marker: {
         color: 'blue',
@@ -132,7 +160,8 @@ const trace4 = {
     hovertemplate: '%{x}<br>План добычи: %{y}',
 }
 
-const data = [trace1, trace2, trace3, trace4]
+const data = [trace1, trace2, trace4]
+
 
 const layout = {
     title: 'Скважина 1-1',
@@ -149,11 +178,18 @@ const layout = {
         zeroline: false,
     },
     legend: {
-        y: -0.1,
+        get y() {
+            if (window.screen.width <= 860) {
+                return -0.3
+            } else {
+                return -0.1
+            }
+        },
         x: 0.5,
         xanchor: 'center',
         orientation: 'h',
-    },
+    }
+
 }
 
 const config = {
