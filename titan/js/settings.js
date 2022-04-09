@@ -1,71 +1,8 @@
-const chart = document.getElementById('chart')
-
-function setPlan(value) {
-    trace4.y = [value, value]
-    Plotly.newPlot(chart, data, layout, config)
-}
-
-function setValue(value, date) {
-    points.push([value, date])
-    initPoints()
-    Plotly.newPlot(chart, data, layout, config)
-}
-
-function initPoints() {
-    points.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
-    arr1.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
-    trace1.x = trace2.x = arr1.map(e => e[1])
-    trace1.y = arr1.map(e => e[0])
-    trace2.y = arr1.map(e => e[0])
-    trace2.y.reduce((sum, current, index) => {
-        trace2.y[index] = (current  - sum)
-        return current
-    }, 0)
-}
-
-const points = [
-    [10, '2022-06-15 5:01'],
-    [10, '2022-06-15 5:30'],
-    [10, '2022-06-15 5:50'],
-    [12, '2022-06-15 6:34'],
-    [20, '2022-06-15 8:11'],
-    [15, '2022-06-15 7:32'],
-    [25, '2022-06-15 9:01'],
-    [40, '2022-06-15 10:55'],
-    [35, '2022-06-15 10:44'],
-    [55, '2022-06-15 10:59'],
-    [35, '2022-06-15 10:24'],
-]
-
-const newArr = points.map(e => {
-    return [e[0], new Date(e[1]).getHours()]
-})
-
-const arr1 = []
-newArr.reduce((previousValue, currentValue) => {
-    if (previousValue[1] == currentValue[1]) {
-        arr1.push([previousValue[0], '2022-06-15 ' + previousValue[1] + ':00'])
-        arr1.reduce((previous, current, index) => {
-            if (previous[1] == current[1]) {
-                arr1.splice(index-1, 1)
-            }
-            return current
-        })
-    } else {
-        previousValue = [previousValue[0], '2022-06-15 ' + previousValue[1] + ':00']
-        arr1.push(previousValue)
-    }
-    return currentValue
-})
-
-console.log(arr1)
-
-
-const trace1 = {
+export const trace1 = {
     name: 'Добыто (сутки)',
     x: 0,
     y: 0,
-    mode: 'lines+markers',
+    mode: 'lines',
     type: 'scatter',
     marker: {
         color: 'blue',
@@ -84,7 +21,7 @@ const trace1 = {
     hovertemplate: '%{x}<br>Добыто (сутки): %{y}',
 }
 
-const trace2 = {
+export const trace2 = {
     name: 'Добыто (час)',
     x: 0,
     y: 0,
@@ -108,7 +45,7 @@ const trace2 = {
     hovertemplate: '%{x}<br>Добыто (час): %{y}',
 }
 
-const trace3 = {
+export const trace3 = {
     name: 'Прогноз добычи',
     x: ['2022-06-15 10:00', '2022-06-15 23:59'],
     y: ['35', '110'],
@@ -137,7 +74,7 @@ const trace3 = {
     hovertemplate: '%{x}<br>Прогноз добычи: %{y}',
 }
 
-const trace4 = {
+export const trace4 = {
     name: 'План добычи',
     mode: 'lines',
     type: 'scatter',
@@ -160,10 +97,8 @@ const trace4 = {
     hovertemplate: '%{x}<br>План добычи: %{y}',
 }
 
-const data = [trace1, trace2, trace4]
 
-
-const layout = {
+export const layout = {
     title: 'Скважина 1-1',
     xaxis: {
         range: ['2022-06-14 23:00', '2022-06-16 01:00'],
@@ -192,18 +127,8 @@ const layout = {
 
 }
 
-const config = {
+export const config = {
     scrollZoom: true,
     responsive: true,
     /*     editable: true, */
 }
-
-
-
-initPoints()
-console.log(trace2)
-Plotly.newPlot(chart, data, layout, config)
-
-console.log(new Date(1529038860000).toISOString())
-console.log(new Date('2022-06-15 10:00').getTime())
-console.log(Date.parse('2022-06-15 10:00'))
