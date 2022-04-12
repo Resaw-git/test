@@ -47,8 +47,8 @@ export const trace2 = {
 
 export const trace3 = {
     name: 'Прогноз добычи',
-    x: ['2022-06-15 10:00', '2022-06-15 23:59'],
-    y: ['35', '110'],
+    x: 0,
+    y: 0,
     line: {
         dash: 'dot',
         color: 'orange'
@@ -80,15 +80,15 @@ export const trace4 = {
     type: 'scatter',
     fill: 'tozeroy',
     line: {
-        color: 'rgba(77,176,255,0.5)'
+        color: 'rgb(77,176,255)'
     },
-    x: ['2022-06-15', '2022-06-16'],
-    y: ['100', '100'],
+    x: 0,
+    y: 0,
     hoverlabel: {
         align: 'left',
         namelength: 0,
         bgcolor: '#fff',
-        bordercolor: 'rgba(77,176,255,0.5)',
+        bordercolor: 'rgb(77,176,255)',
         font: {
             color: '#000'
         }
@@ -101,7 +101,7 @@ export const trace4 = {
 export const layout = {
     title: 'Скважина 1-1',
     xaxis: {
-        range: ['2022-06-14 23:00', '2022-06-16 01:00'],
+        range: 0,
         type: 'date',
         dtick: 7200000,
         ticks: 'outside',
@@ -109,17 +109,12 @@ export const layout = {
         ticklen: 10,
     },
     yaxis: {
+        range: 0,
         ticksuffix: ' тыс. м',
         zeroline: false,
     },
     legend: {
-        get y() {
-            if (window.screen.width <= 860) {
-                return -0.3
-            } else {
-                return -0.1
-            }
-        },
+        y: -0.25,
         x: 0.5,
         xanchor: 'center',
         orientation: 'h',
