@@ -23,35 +23,42 @@ function getPoints(date) {
 }
 
 window.setPlan = (value) => {
-    trace4.y = [value, value]
-    trace4.x = [
-        new Date(parseDate).toISOString(), 
-        new Date(parseDate + (hourMilliseconds * 24 - (60000))).toISOString()
-    ]
-    calcTrace3()
-    Plotly.newPlot(chart, [trace1, trace2, trace3, trace4], layout, config)
+    if (value <= 0) {
+        console.log('Нельзя установить отрицательное число или 0')
+    } else {
+        trace4.y = [value, value]
+        trace4.x = [
+            new Date(parseDate).toISOString(), 
+            new Date(parseDate + (hourMilliseconds * 24 - (60000))).toISOString()
+        ]
+        calcTrace3()
+        Plotly.newPlot(chart, [trace1, trace2, trace3, trace4], layout, config)
+    }
 }
 
 window.setValue = (value, date) => {
-    points.push([value, date])
-    initPoints()
-    Plotly.newPlot(chart, [trace1, trace2, trace3, trace4], layout, config)
+    if (value <= 0) {
+        console.log('Нельзя установить отрицательное число или 0')
+    } else {
+        points.push([value, date])
+        initPoints()
+        Plotly.newPlot(chart, [trace1, trace2, trace3, trace4], layout, config)
+    }
 }
 
 function initPoints() {
-    points.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
-    
-    trace1.x = points.map(e => e[1])
-    trace1.y = points.map(e => e[0])
+    const points1 = calcTrace1()
+    trace1.x = points1.map(e => e[1])
+    trace1.y = points1.map(e => e[0])
 
-
-    const newPoints = calcTrace2()
-    trace2.x = newPoints.map(e => e[1])
-    trace2.y = newPoints.map(e => e[0])
+    const points2 = calcTrace2(points1)
+    trace2.x = points2.map(e => e[1])
+    trace2.y = points2.map(e => e[0])
     trace2.y.reduce((sum, current, index) => {
         trace2.y[index] = (current  - sum)
         return current
     }, 0)
+
 
     trace3.x = [
         trace1.x[trace1.x.length-1],
@@ -61,26 +68,41 @@ function initPoints() {
         trace1.y[trace1.y.length-1],
         calcTrace3()
     ]
-
 }
 
-function calcTrace2() {
+function calcTrace1() {
     const result = []
-    const hours = points.map(e => {
+    points.sort((a, b) => Date.parse(a[1]) - Date.parse(b[1]))
+    points.reduce((previous, current, index) => {
+        if (index == 1) {
+            result.push(previous)
+        }
+        if (previous[0] > current[0]) {
+            current[0] += previous[0]
+        }
+        result.push(current)
+        return current
+    })
+    return result
+}
+
+function calcTrace2(data) {
+    const result = []
+    const hours = data.map(e => {
         return [e[0], new Date(e[1]).getHours()]
     })
 
-    hours.reduce((previousValue, currentValue, index) => {
+    hours.reduce((previous, current, index) => {
         if (index == 1) {
-            result.push([previousValue[0], selectedDate + ' ' + previousValue[1] + ':00'])
+            result.push([previous[0], selectedDate + ' ' + previous[1] + ':00'])
         }
-        if (previousValue[1] == currentValue[1]) {
+        if (previous[1] == current[1]) {
             result.splice(result.length-1, 1)
-            result.push([currentValue[0], selectedDate + ' ' + currentValue[1] + ':00'])
+            result.push([current[0], selectedDate + ' ' + current[1] + ':00'])
         } else {
-            result.push([currentValue[0], selectedDate + ' ' + currentValue[1] + ':00'])
+            result.push([current[0], selectedDate + ' ' + current[1] + ':00'])
         }
-        return currentValue
+        return current
     })
     return result
 }
@@ -118,7 +140,7 @@ function getTotalMinutes(date) {
 initPoints()
 setPlan(100)
 
-const message = `
+/* const message = `
 Дата по умолчанию выставлена на ${selectedDate}
 Выборка точек извлекается из файла data.js
 Чтобы выставить план добычи введите в консоли setPlan(value), где value - число
@@ -129,7 +151,7 @@ const message = `
 
 `
 console.log(message)
-
+ */
 
 let resizeDebounce = null;
 
